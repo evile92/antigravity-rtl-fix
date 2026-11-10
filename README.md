@@ -10,7 +10,7 @@ Also fully compatible with **Persian (Farsi)**, **Urdu**, **Pashto**, **Kurdish*
 
 | Before (قبل الإصلاح) ❌ | After (بعد الإصلاح) ✅ |
 | :---: | :---: |
-| <img src="assets/before.png" alt="Before RTL Fix" width="100%"> | <img src="assets/after.jpg" alt="After RTL Fix" width="100%"> |
+| <img src="assets/before.jpg" alt="Before RTL Fix" width="100%"> | <img src="assets/after.jpg" alt="After RTL Fix" width="100%"> |
 | *محاذاة خاطئة، علامات ترقيم وأقواس مقلوبة، وتداخل مشوه للكلمات الإنجليزية*<br>*Mangled punctuation, reversed brackets, and broken mixed-text alignment* | *محاذاة كاملة لليمين، علامات ترقيم سليمة، وتناسق انسيابي تام للنصوص المختلطة*<br>*Clean RTL direction, correct punctuation, and proper BiDi rendering* |
 
 ---
