@@ -65,10 +65,11 @@ BLOCK_SIZE = 4 * 1024 * 1024  # asar integrity block size
 
 def build_css(scope: str) -> str:
     s = (scope.strip() + " ") if scope.strip() else ""
+    msg_sel = "[data-testid='user-message-content'], [data-testid='user-message-bubble'], .agy-user-bubble, [data-testid='transcript-line-text'], textarea, input[type='text'], [contenteditable='true']"
     return (
-        f"{s}:is(p, h1, h2, h3, h4, h5, h6):dir(rtl) {{"
+        f"{s}:is(p, h1, h2, h3, h4, h5, h6, {msg_sel}):dir(rtl) {{"
         " direction: rtl !important; text-align: right !important; }"
-        f"{s}:is(p, h1, h2, h3, h4, h5, h6):dir(ltr) {{"
+        f"{s}:is(p, h1, h2, h3, h4, h5, h6, {msg_sel}):dir(ltr) {{"
         " direction: ltr !important; text-align: left !important; }"
         f"{s}:is(p, h1, h2, h3, h4, h5, h6):not([dir]):not(li, li *, pre *, code *, .monaco-editor *) {{"
         " unicode-bidi: plaintext !important; text-align: start !important; }"
@@ -89,13 +90,15 @@ def build_js_block(css: str, nl: str) -> str:
         " window.__antigravityRtlFixInstalled = true;"
         " const arRegex = /[\\u0600-\\u06FF\\u0750-\\u077F\\u08A0-\\u08FF\\uFB50-\\uFDFF\\uFE70-\\uFEFF]/;"
         " let timer = null;"
+        " const sel = 'p, h1, h2, h3, h4, h5, h6, ol, ul, [data-testid=\"user-message-content\"], [data-testid=\"user-message-bubble\"], .agy-user-bubble, [data-testid=\"transcript-line-text\"], textarea, [contenteditable=\"true\"]';"
         " const scan = () => {"
         "  try {"
-        "   document.querySelectorAll('p, h1, h2, h3, h4, h5, h6, ol, ul').forEach(el => {"
+        "   document.querySelectorAll(sel).forEach(el => {"
         "    if (el.closest('pre, code, .monaco-editor')) return;"
         "    if (el.matches('ol, ul') && el.parentElement?.closest('ol, ul')) return;"
         "    if (el.matches('p') && el.closest('li')) return;"
-        "    const target = arRegex.test(el.textContent || '') ? 'rtl' : 'ltr';"
+        "    const text = el.value || el.textContent || '';"
+        "    const target = arRegex.test(text) ? 'rtl' : 'ltr';"
         "    if (el.getAttribute('dir') !== target) el.setAttribute('dir', target);"
         "   });"
         "  } catch (_) {}"
@@ -107,6 +110,14 @@ def build_js_block(css: str, nl: str) -> str:
         " });"
         " const target = document.body || document.documentElement;"
         " if (target) obs.observe(target, { childList: true, subtree: true, characterData: true });"
+        " document.addEventListener('input', e => {"
+        "  const t = e.target;"
+        "  if (t && (t.matches?.('textarea, input, [contenteditable=\"true\"]') || t.closest?.('.surface-composer'))) {"
+        "   const text = t.value || t.textContent || '';"
+        "   const dir = arRegex.test(text) ? 'rtl' : 'ltr';"
+        "   if (t.getAttribute('dir') !== dir) t.setAttribute('dir', dir);"
+        "  }"
+        " }, true);"
         "})();"
     )
     lines = [
@@ -115,21 +126,21 @@ def build_js_block(css: str, nl: str) -> str:
         "        const __rtlFixCss = " + json.dumps(css) + ";",
         "        const __rtlFixJs = " + json.dumps(client_js) + ";",
         "        const __rtlFixInject = () => {",
-            "            if (win.isDestroyed?.() || hubContents.isDestroyed?.()) {",
-            "                return;",
-            "            }",
-            "            void Promise.resolve(hubContents.insertCSS(__rtlFixCss, { cssOrigin: 'user' })).catch(() => undefined);",
-            "            void Promise.resolve(hubContents.executeJavaScript(__rtlFixJs)).catch(() => undefined);",
-            "        };",
-            "        hubContents.on('dom-ready', __rtlFixInject);",
-            "        win.on('closed', () => {",
-            "            hubContents.off?.('dom-ready', __rtlFixInject);",
-            "        });",
-            "    }",
-            "    catch (_rtlFixErr) {",
-            "        // Never break window creation because of the RTL fix.",
-            "    }",
-            "    " + MARKER_END,
+        "            if (win.isDestroyed?.() || hubContents.isDestroyed?.()) {",
+        "                return;",
+        "            }",
+        "            void Promise.resolve(hubContents.insertCSS(__rtlFixCss, { cssOrigin: 'user' })).catch(() => undefined);",
+        "            void Promise.resolve(hubContents.executeJavaScript(__rtlFixJs)).catch(() => undefined);",
+        "        };",
+        "        hubContents.on('dom-ready', __rtlFixInject);",
+        "        win.on('closed', () => {",
+        "            hubContents.off?.('dom-ready', __rtlFixInject);",
+        "        });",
+        "    }",
+        "    catch (_rtlFixErr) {",
+        "        // Never break window creation because of the RTL fix.",
+        "    }",
+        "    " + MARKER_END,
     ]
     return nl.join(lines)
 
