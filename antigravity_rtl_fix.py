@@ -66,17 +66,19 @@ BLOCK_SIZE = 4 * 1024 * 1024  # asar integrity block size
 def build_css(scope: str) -> str:
     s = (scope.strip() + " ") if scope.strip() else ""
     return (
-        f"{s}:is(p, li, ul, ol, h1, h2, h3, h4, h5, h6):not(pre *, code *, .monaco-editor *) {{"
+        f"{s}:is(p, h1, h2, h3, h4, h5, h6):dir(rtl) {{"
+        " direction: rtl !important; text-align: right !important; }"
+        f"{s}:is(p, h1, h2, h3, h4, h5, h6):dir(ltr) {{"
+        " direction: ltr !important; text-align: left !important; }"
+        f"{s}:is(p, h1, h2, h3, h4, h5, h6):not([dir]):not(li, li *, pre *, code *, .monaco-editor *) {{"
         " unicode-bidi: plaintext !important; text-align: start !important; }"
-        f" {s}:is(ul, ol):dir(rtl) {{"
-        " direction: rtl !important; text-align: right !important; }"
-        f" {s}:is(ul, ol):dir(ltr) {{"
+        f"{s}:is(ul, ol):dir(rtl), {s}:is(ul, ol):dir(rtl) li, {s}:is(ul, ol):dir(rtl) p {{"
+        " direction: rtl !important; text-align: right !important; unicode-bidi: normal !important; }"
+        f"{s}:is(ul, ol):dir(ltr), {s}:is(ul, ol):dir(ltr) li, {s}:is(ul, ol):dir(ltr) p {{"
+        " direction: ltr !important; text-align: left !important; unicode-bidi: normal !important; }"
+        f"{s}:is(pre, code), {s}:is(pre, code) * {{"
         " direction: ltr !important; text-align: left !important; }"
-        f" {s}:is(ul, ol):dir(rtl) :is(ul, ol) {{"
-        " direction: rtl !important; text-align: right !important; }"
-        f" {s}:is(pre, code), {s}:is(pre, code) * {{"
-        " direction: ltr !important; text-align: left !important; }"
-        f" {s}code {{ unicode-bidi: isolate !important; }}"
+        f"{s}code {{ unicode-bidi: isolate !important; }}"
     )
 
 
@@ -89,14 +91,12 @@ def build_js_block(css: str, nl: str) -> str:
         " let timer = null;"
         " const scan = () => {"
         "  try {"
-        "   document.querySelectorAll('ol, ul').forEach(list => {"
-        "    if (list.closest('pre, code, .monaco-editor')) return;"
-        "    if (!list.parentElement?.closest('ol, ul')) {"
-        "     const hasAr = arRegex.test(list.textContent || '');"
-        "     const cur = list.getAttribute('dir');"
-        "     const target = hasAr ? 'rtl' : 'ltr';"
-        "     if (cur !== target) list.setAttribute('dir', target);"
-        "    }"
+        "   document.querySelectorAll('p, h1, h2, h3, h4, h5, h6, ol, ul').forEach(el => {"
+        "    if (el.closest('pre, code, .monaco-editor')) return;"
+        "    if (el.matches('ol, ul') && el.parentElement?.closest('ol, ul')) return;"
+        "    if (el.matches('p') && el.closest('li')) return;"
+        "    const target = arRegex.test(el.textContent || '') ? 'rtl' : 'ltr';"
+        "    if (el.getAttribute('dir') !== target) el.setAttribute('dir', target);"
         "   });"
         "  } catch (_) {}"
         " };"
@@ -115,21 +115,21 @@ def build_js_block(css: str, nl: str) -> str:
         "        const __rtlFixCss = " + json.dumps(css) + ";",
         "        const __rtlFixJs = " + json.dumps(client_js) + ";",
         "        const __rtlFixInject = () => {",
-        "            if (win.isDestroyed?.() || hubContents.isDestroyed?.()) {",
-        "                return;",
-        "            }",
-        "            void Promise.resolve(hubContents.insertCSS(__rtlFixCss, { cssOrigin: 'user' })).catch(() => undefined);",
-        "            void Promise.resolve(hubContents.executeJavaScript(__rtlFixJs)).catch(() => undefined);",
-        "        };",
-        "        hubContents.on('dom-ready', __rtlFixInject);",
-        "        win.on('closed', () => {",
-        "            hubContents.off?.('dom-ready', __rtlFixInject);",
-        "        });",
-        "    }",
-        "    catch (_rtlFixErr) {",
-        "        // Never break window creation because of the RTL fix.",
-        "    }",
-        "    " + MARKER_END,
+            "            if (win.isDestroyed?.() || hubContents.isDestroyed?.()) {",
+            "                return;",
+            "            }",
+            "            void Promise.resolve(hubContents.insertCSS(__rtlFixCss, { cssOrigin: 'user' })).catch(() => undefined);",
+            "            void Promise.resolve(hubContents.executeJavaScript(__rtlFixJs)).catch(() => undefined);",
+            "        };",
+            "        hubContents.on('dom-ready', __rtlFixInject);",
+            "        win.on('closed', () => {",
+            "            hubContents.off?.('dom-ready', __rtlFixInject);",
+            "        });",
+            "    }",
+            "    catch (_rtlFixErr) {",
+            "        // Never break window creation because of the RTL fix.",
+            "    }",
+            "    " + MARKER_END,
     ]
     return nl.join(lines)
 
