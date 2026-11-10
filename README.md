@@ -28,6 +28,8 @@ Also fully compatible with **Persian (Farsi)**, **Urdu**, **Pashto**, **Kurdish*
 - Python 3.8 or newer (ensure "Add python.exe to PATH" is checked during installation)
 
 ### How to Install & Apply
+> **File Location**: You can extract and run this tool from **any location on your computer** (Desktop, Downloads, etc.). The script automatically detects the Antigravity installation path. The only requirement is that `antigravity_rtl_fix.py` and `Run_RTL_Fix.bat` remain together in the same folder.
+
 1. Fully exit Antigravity (right-click the Antigravity icon in the Windows taskbar tray near the clock and click **Quit**).
 2. Download or clone this repository.
 3. Double-click **`Run_RTL_Fix.bat`**.
@@ -59,6 +61,8 @@ To revert to the stock version at any time:
 - تثبيت بايثون (Python 3.8+) مع تفعيل خيار `Add python.exe to PATH`.
 
 ### خطوات التثبيت والتشغيل
+> **مكان وجود الملفات**: يمكنك تشغيل الأداة من **أي مسار على جهازك** (سطح المكتب، التنزيلات، أو أي مجلد). السكريبت يبحث تلقائياً عن مسار تثبيت برنامج Antigravity في النظام. الشرط الوحيد هو أن يكون الملفان (`antigravity_rtl_fix.py` و `Run_RTL_Fix.bat`) معاً داخل نفس المجلد.
+
 1. إغلاق برنامج Antigravity بالكامل (من شريط المهام بجانب الساعة: كليك يمين ثم **Quit**).
 2. تشغيل الملف **`Run_RTL_Fix.bat`**.
 3. اختيار الرقم **`2`** لتطبيق الإصلاح.
