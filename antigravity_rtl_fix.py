@@ -266,6 +266,17 @@ def is_running() -> bool:
     return EXE_NAME.lower() in out.lower()
 
 
+def kill_running() -> bool:
+    try:
+        subprocess.run(["taskkill", "/F", "/IM", EXE_NAME, "/T"],
+                       capture_output=True, text=True, timeout=10)
+        import time
+        time.sleep(1)
+        return not is_running()
+    except Exception:
+        return False
+
+
 # ---------------------------------------------------------------------------
 # Actions
 # ---------------------------------------------------------------------------
@@ -307,8 +318,18 @@ def apply_patch(install_dir) -> bool:
     asar, backup, meta, tmp = paths(install_dir)
     info = diagnose(install_dir)
     if info["running"]:
-        print("\n[STOP] Antigravity is running. Close it completely (also from the tray) and retry.")
-        return False
+        print("\n[!] Antigravity is currently running in the background.")
+        choice = input("Do you want to close it automatically to apply the fix? (y/n): ").strip().lower()
+        if choice in ["y", "yes"]:
+            if kill_running():
+                print("[OK] Antigravity closed successfully.")
+                info = diagnose(install_dir)
+            else:
+                print("[STOP] Failed to close Antigravity automatically. Please close it manually and retry.")
+                return False
+        else:
+            print("[STOP] Antigravity must be closed to apply changes.")
+            return False
     arc = Asar(asar)
     raw = arc.read(TARGET_FILE)
     src = raw.decode("utf-8")
@@ -377,8 +398,18 @@ def restore(install_dir) -> bool:
     asar, backup, meta, _ = paths(install_dir)
     info = diagnose(install_dir)
     if info["running"]:
-        print("\n[STOP] Antigravity is running. Close it completely and retry.")
-        return False
+        print("\n[!] Antigravity is currently running in the background.")
+        choice = input("Do you want to close it automatically to restore? (y/n): ").strip().lower()
+        if choice in ["y", "yes"]:
+            if kill_running():
+                print("[OK] Antigravity closed successfully.")
+                info = diagnose(install_dir)
+            else:
+                print("[STOP] Failed to close Antigravity automatically. Please close it manually and retry.")
+                return False
+        else:
+            print("[STOP] Antigravity must be closed to restore.")
+            return False
     if not info["patched"]:
         print("\n[OK] Current app is not patched (or was updated). Nothing to restore.")
         return True
