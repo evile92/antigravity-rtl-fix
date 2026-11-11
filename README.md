@@ -62,6 +62,10 @@ To revert to the stock version at any time:
 2. Run **`Run_RTL_Fix.bat`**.
 3. Choose option **`3`** to restore the original backup.
 
+### ⚠️ Important Note About Antigravity Updates
+Whenever **Antigravity** installs an official update, its updater replaces `resources\app.asar` with a fresh unpatched copy for the new version. This will revert the chat UI back to the default layout.
+- To restore RTL support after any Antigravity update, simply run **`Run_RTL_Fix.bat`** again and choose option **`2`**. The script will automatically refresh the backup for the new version and re-apply the fix.
+
 ---
 
 <a name="arabic"></a>
@@ -104,3 +108,7 @@ Run_RTL_Fix.bat
 1. إغلاق Antigravity بالكامل.
 2. تشغيل **`Run_RTL_Fix.bat`**.
 3. اختيار الرقم **`3`** لاسترجاع النسخة الأصلية فوراً.
+
+### ⚠️ ملاحظة مهمة عند تحديث برنامج Antigravity
+عند قيام برنامج **Antigravity** بتنزيل وتثبيت أي تحديث رسمي جديد، يقوم نظام التحديث باستبدال ملف `resources\app.asar` بالكامل بنسخة جديدة ونظيفة تخص الإصدار الجديد، مما يؤدي إلى اختفاء تعديل الاتجاه (RTL) وعودة الواجهة لوضعها الافتراضي.
+- **الحل:** بعد أي تحديث للبرنامج، ما عليك سوى تشغيل **`Run_RTL_Fix.bat`** مجدداً واختيار الرقم **`2`**، وسيقوم السكريبت تلقائياً بتحديث النسخة الاحتياطية للإصدار الجديد وإعادة تطبيق الإصلاح في ثوانٍ.

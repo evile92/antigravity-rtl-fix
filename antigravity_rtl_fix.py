@@ -336,13 +336,17 @@ def apply_patch(install_dir) -> bool:
     nl = "\r\n" if "\r\n" in src else "\n"
     target_block = build_js_block(build_css(CHAT_SCOPE), nl)
 
-    if info["patched"]:
+    was_patched = info["patched"]
+    if was_patched:
         if target_block in src:
             print("\n[OK] Fix is already up to date. Nothing to do (no duplicate injection).")
             return True
         print("\n[INFO] Updating existing patch to the latest version...")
         if not info["backup_exists"]:
             print("[STOP] Cannot update: backup file not found. Reinstall or restore original first.")
+            return False
+        if app_version(backup) != info["app_version"]:
+            print("[STOP] Backup is from a different app version. Reinstall or restore original first.")
             return False
         shutil.copy2(backup, asar)
         arc = Asar(asar)
@@ -354,16 +358,17 @@ def apply_patch(install_dir) -> bool:
         print("\n[STOP] App code differs from the verified version. Not safe to patch. No changes made.")
         return False
 
-    new_src = src.replace(ANCHOR, ANCHOR + nl + target_block, 1)
-    new_bytes = new_src.encode("utf-8")
-
-    # Backup the current (unpatched) archive if backup doesn't already exist.
-    if not os.path.isfile(backup):
+    if not was_patched:
+        # App was unpatched (fresh install or after an official Antigravity update).
+        # Save/refresh the clean backup for the current app version.
         shutil.copy2(asar, backup)
         if sha256_file(backup) != sha256_file(asar):
             print("[STOP] Backup verification failed. No changes made.")
             return False
         print(f"\n[OK] Backup created: {backup}")
+
+    new_src = src.replace(ANCHOR, ANCHOR + nl + target_block, 1)
+    new_bytes = new_src.encode("utf-8")
 
     # Append new utils.js bytes; all other file bytes stay byte-identical.
     entry = arc.entry(TARGET_FILE)
