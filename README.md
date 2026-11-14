@@ -1,5 +1,10 @@
 # Antigravity RTL & BiDi Fix
 
+> [!NOTE]
+> **Status Update (Antigravity v2.32.1+):** Google Antigravity has officially added native RTL (`dir="auto"` / BiDi) support in the Agent Manager chat interface starting in **v2.32.1**. Most users on v2.32.1 or newer no longer need this patch. This tool remains available for older versions (`< 2.32.1`), edge cases (such as RTL list items starting with English acronyms), or in case the issue ever returns.
+>
+> **تحديث الحالة (إصدار Antigravity 2.32.1 فأحدث):** تم حل مشكلة اتجاه النصوص العربية (RTL) رسمياً داخل البرنامج بدءاً من الإصدار **2.32.1**. إذا كنت تستخدم هذا الإصدار أو أحدث فلن تحتاج إلى تطبيق الأداة غالباً. يبقى المستودع متاحاً كمرجع لمن يستخدمون إصدارات أقدم، أو لبعض الحالات الخاصة (مثل أسطر القوائم العربية التي تبدأ بكلمة إنجليزية)، أو في حال عادت المشكلة في تحديثات قادمة.
+
 A lightweight utility to resolve Right-to-Left (RTL) text direction and English/Arabic mixed-text alignment issues in Google Antigravity's Agent Manager chat interface.
 
 Also fully compatible with **Persian (Farsi)**, **Urdu**, **Pashto**, **Kurdish**, and any language using the Arabic script.
